@@ -32,3 +32,21 @@ class Product(BaseModel): #! TU CODIGO: permite crear modelos de datos (Entidade
         ge=0,                 #! Debe ser mayor o igual a 0
         description="Cantidad en stock del producto"
     )
+
+
+
+    #* ===============validations==================
+
+    #? gt / ge → mayor (>) / mayor o igual (≥)
+
+    #? lt / le → menor (<) / menor o igual (≤)
+
+    #? min_length / max_length → tamaño de texto
+
+    #? regex → patrón
+
+    #? min_items / max_items → tamaño de listas
+
+    #? EmailStr / HttpUrl / UUID → tipos inteligentes
+
+    #? description → Swagger feliz
