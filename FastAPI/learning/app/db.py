@@ -1,44 +1,43 @@
-from app.models import Product
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
+import os
+from dotenv import load_dotenv
 
+# Cargar variables de entorno desde .env
+load_dotenv()
 
-products_db = [Product(
-        id=1,
-        nombre="Teclado mecánico",
-        descripcion="Teclado mecánico con switches azules y retroiluminación RGB",
-        precio=249.99,
-        categoria="Periféricos",
-        stock=15
-    ),
-    Product(
-        id=2,
-        nombre="Mouse inalámbrico",
-        descripcion="Mouse ergonómico inalámbrico con sensor óptico de alta precisión",
-        precio=89.5,
-        categoria="Periféricos",
-        stock=30
-    ),
-    Product(
-        id=3,
-        nombre="Monitor 24 pulgadas",
-        descripcion="Monitor Full HD de 24 pulgadas con panel IPS",
-        precio=699.99,
-        categoria="Pantallas",
-        stock=8
-    ),
-    Product(
-        id=4,
-        nombre="Disco SSD 1TB",
-        descripcion="Unidad de estado sólido SSD de 1TB para alto rendimiento",
-        precio=459.0,
-        categoria="Almacenamiento",
-        stock=20
-    ),
-    Product(
-        id=5,
-        nombre="Audífonos gaming",
-        descripcion="Audífonos gaming con micrófono y sonido envolvente",
-        precio=179.99,
-        categoria="Audio",
-        stock=0  #! Producto agotado, caso real
-    )
-]  #! base de datos simulada
+# Obtener URL de la base de datos desde variables de entorno
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:josdav@localhost:5432/api_db")
+
+# Crear motor de SQLAlchemy
+engine = create_engine(DATABASE_URL, echo=True)  #! echo=True muestra SQL en consola (útil para debugging)
+
+# Crear sesión
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+# Base para modelos
+Base = declarative_base()
+
+# Modelo SQLAlchemy para la tabla 'products'
+class ProductDB(Base):
+    __tablename__ = "products"
+    
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    nombre = Column(String(150), nullable=False)
+    descripcion = Column(Text, nullable=True)
+    precio = Column(Float, nullable=False)
+    categoria = Column(String(80), nullable=False)
+    stock = Column(Integer, nullable=False, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+# Función para obtener sesión de base de datos
+def get_db():
+    """Dependency para obtener sesión de base de datos"""
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
