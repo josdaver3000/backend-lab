@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.types import Numeric
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import os
@@ -9,10 +10,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Obtener URL de la base de datos desde variables de entorno
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:josdav@localhost:5432/api_db")
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("La variable de entorno DATABASE_URL no está configurada")
 
 # Crear motor de SQLAlchemy
-engine = create_engine(DATABASE_URL, echo=True)  #! echo=True muestra SQL en consola (útil para debugging)
+DEBUG = os.getenv("DEBUG", "False") == "True"
+engine = create_engine(DATABASE_URL, echo=DEBUG)
 
 # Crear sesión
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -27,7 +31,7 @@ class ProductDB(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     nombre = Column(String(150), nullable=False)
     descripcion = Column(Text, nullable=True)
-    precio = Column(Float, nullable=False)
+    precio = Column(Numeric(10, 2), nullable=False)
     categoria = Column(String(80), nullable=False)
     stock = Column(Integer, nullable=False, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -11,7 +11,7 @@ def seed_database():
         # Verificar si ya hay productos
         count = db.query(ProductDB).count()
         if count > 0:
-            print(f"⚠️  La base de datos ya tiene {count} productos.")
+            print(f"La base de datos ya tiene {count} productos.")
             response = input("¿Deseas eliminar todos y recargar? (s/n): ")
             if response.lower() == 's':
                 db.query(ProductDB).delete()

@@ -3,6 +3,8 @@ from app.models import Product
 from typing import Optional
 from sqlalchemy.orm import Session
 from datetime import datetime
+from sqlalchemy.exc import IntegrityError
+
 
 def buscar_prod_int(db: Session, id: int) -> Optional[ProductDB]:
     """Buscar producto por ID en la base de datos"""
@@ -44,14 +46,14 @@ def actualizar_stock(db: Session, id: int, quantity: int) -> Optional[ProductDB]
     product = buscar_prod_int(db, id)
     if product:
         nuevo_stock = product.stock + quantity
-        if nuevo_stock >= 0:  #! No permitir stock negativo
+        if nuevo_stock >= 0:
             product.stock = nuevo_stock
             product.updated_at = datetime.utcnow()
             db.commit()
             db.refresh(product)
             return product
-        return None  #! Stock resultante sería negativo
-    return None  #! Producto no encontrado
+        return None
+    return None
 
 def obtener_todos_productos(db: Session) -> list[ProductDB]:
     """Obtener todos los productos de la base de datos"""
@@ -66,10 +68,15 @@ def crear_producto(db: Session, product: Product) -> ProductDB:
         categoria=product.categoria,
         stock=product.stock
     )
-    db.add(db_product)
-    db.commit()
-    db.refresh(db_product)
-    return db_product
+    try:
+        db.add(db_product)
+        db.commit()
+        db.refresh(db_product)
+        return db_product
+    except IntegrityError:
+        db.rollback()
+        raise ValueError("Error al crear el producto.")  
+    
 
 def eliminar_producto(db: Session, id: int) -> bool:
     """Eliminar un producto por su ID"""

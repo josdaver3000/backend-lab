@@ -14,15 +14,12 @@ from app.services import (
 )
 from app.db import get_db
 from sqlalchemy.orm import Session
+from app.db import ProductDB
 
 router = APIRouter()
 
-
-
-#! IMPORTANTE: Las rutas específicas van ANTES que las rutas con parámetros {id}
-#! Si no, FastAPI interpretará "low_stock" como un ID
-
-#* ======================= GET ======================== (para leer datos)
+# IMPORTANTE: Las rutas específicas van ANTES que las rutas con parámetros {id}
+# Si no, FastAPI interpretará "low_stock" como un ID
 
 @router.get("/productos", response_model=list[ProductResponse]) 
 def obtener_todos_productos_route(db: Session = Depends(get_db)):
@@ -32,7 +29,7 @@ def obtener_todos_productos_route(db: Session = Depends(get_db)):
 @router.get("/productos/low_stock", response_model=list[ProductResponse])
 def obtener_productos_bajo_stock(threshold: int = 5, db: Session = Depends(get_db)):
     """Obtener productos con stock bajo (por defecto <= 5)"""
-    from app.db import ProductDB
+    
     low_stock_products = db.query(ProductDB).filter(ProductDB.stock <= threshold).all()
     return low_stock_products
 
@@ -42,7 +39,7 @@ def obtener_producto_por_nombre(nombre: str, db: Session = Depends(get_db)):
     product = buscar_prod_nombre(db, nombre)
     if product:
         return product
-    raise HTTPException(status_code=404, detail="Producto no encontrado") #! 404 es no encontrado
+    raise HTTPException(status_code=404, detail="Producto no encontrado")
 
 @router.get("/productos/categoria/{categoria}", response_model=list[ProductResponse])
 def obtener_productos_por_categoria(categoria: str, db: Session = Depends(get_db)):
@@ -72,15 +69,11 @@ def verificar_stock_producto(id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Producto no encontrado")
     return {"id": id, "nombre": product.nombre, "stock": product.stock, "disponible": product.stock > 0}
 
-#* ======================= POST/PATCH ======================== (para crear o modificar datos)
-
-@router.post("/productos", response_model=ProductResponse, status_code=201) #! 201 es creado, se pone de esta forma para indicar que se creó un recurso
+@router.post("/productos", response_model=ProductResponse, status_code=201)
 def crear_producto_route(product: Product, db: Session = Depends(get_db)):
     """Crear un nuevo producto"""
-    # No necesitas verificar el ID porque la BD lo genera automáticamente
     return crear_producto(db, product)
 
-#* ======================= PUT ======================== (para reemplazar datos)
 @router.put("/productos/{id}", response_model=ProductResponse)
 def reemplazar_producto(id: int, nuevo_producto: Product, db: Session = Depends(get_db)):
     """Reemplazar un producto existente por completo"""
@@ -89,13 +82,11 @@ def reemplazar_producto(id: int, nuevo_producto: Product, db: Session = Depends(
         return updated
     raise HTTPException(status_code=404, detail="Producto no encontrado")
 
-
-#* ======================= DELETE ======================== (para eliminar datos)
-@router.delete("/productos/{id}", status_code=204)  #! 204 sin contenido = eliminado exitosamente (no devuelve body)
+@router.delete("/productos/{id}", status_code=204)
 def eliminar_producto_route(id: int, db: Session = Depends(get_db)):
     """Eliminar un producto por su ID"""
     if eliminar_producto(db, id):
-        return  #! 204 no devuelve contenido
+        return
     raise HTTPException(status_code=404, detail="Producto no encontrado")
 
 
@@ -105,5 +96,5 @@ def actualizar_stock_producto(id: int, quantity: int, db: Session = Depends(get_
     updated_product = actualizar_stock(db, id, quantity)
     if updated_product:
         return updated_product
-    raise HTTPException(status_code=400, detail="No se pudo actualizar el stock del producto") #! 400 es error de solicitud incorrecta
+    raise HTTPException(status_code=400, detail="No se pudo actualizar el stock del producto")
 
