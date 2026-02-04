@@ -1,10 +1,10 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 
 class Product(BaseModel):
     """Modelo Pydantic para validación de datos de productos"""
-    
+    model_config = ConfigDict(from_attributes=True)
     nombre: str = Field(
         min_length=1,
         max_length=150,
@@ -29,12 +29,11 @@ class Product(BaseModel):
         description="Cantidad en stock del producto"
     )
 
-    class Config:
-        from_attributes = True
-
 
 class ProductResponse(BaseModel):
     """Modelo de respuesta que incluye campos de la BD"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     nombre: str
     descripcion: Optional[str] = None
@@ -43,6 +42,3 @@ class ProductResponse(BaseModel):
     stock: int
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True

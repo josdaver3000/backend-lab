@@ -1,8 +1,8 @@
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 from sqlalchemy.types import Numeric
 from sqlalchemy.orm import sessionmaker
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 from dotenv import load_dotenv
 
@@ -34,8 +34,8 @@ class ProductDB(Base):
     precio = Column(Numeric(10, 2), nullable=False)
     categoria = Column(String(80), nullable=False)
     stock = Column(Integer, nullable=False, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
+    updated_at = datetime.now(timezone.utc)
 
 # Función para obtener sesión de base de datos
 def get_db():

@@ -4,11 +4,11 @@ API REST construida con FastAPI para gestionar un inventario de productos.
 
 ## Características
 
-- ✅ CRUD completo de productos
-- ✅ Búsqueda por ID, nombre y categoría
-- ✅ Filtrado por rango de precios
-- ✅ Control de stock
-- ✅ Documentación automática con Swagger
+- CRUD completo de productos
+- Búsqueda por ID, nombre y categoría
+- Filtrado por rango de precios
+- Control de stock
+- Documentación automática con Swagger
 
 ## Instalación
 
@@ -65,3 +65,39 @@ app/
 - FastAPI 0.128.0
 - Uvicorn 0.40.0
 - Pydantic 2.12.5
+- SQLAlchemy 2.0.36
+- PostgreSQL 14
+
+
+## specifications of the project. 
+
+main.py es el punto de entrada de la aplicación FastAPI.
+
+db.py contiene la configuracion de la base de datos usando SQLAlchemy, migraciones con alembic, manejo de variables de entorno con python-dotenv, modelosDB con SQLAlchemy ORM.
+
+models.py define los modelos de datos usando Pydantic para validación y serialización.
+
+routes.py define los endpoints de la API y maneja las solicitudes http
+
+services.py contiene la lógica de negocio para manejar productos, incluyendo operaciones CRUD y gestión de stock.
+
+seed_data.py es un script para poblar la base de datos con datos iniciales para pruebas y desarrollo.
+
+__init__.py marca el directorio app como un paquete Python.
+
+.env.example proporciona un ejemplo de archivo de variables de entorno para configuración. (para no poner datos sensibles en el repositorio)
+
+## alembic folder
+- Contiene la configuración y scripts de migración de la base de datos usando Alembic.
+
+- versions/: Directorio donde se almacenan los scripts de migración generados por Alembic.
+
+- script.py.mako: Plantilla utilizada por Alembic para generar nuevos scripts de migración.
+- env.py: Archivo de configuración de Alembic que establece la conexión a la base de datos y otras configuraciones necesarias para las migraciones.
+
+- alembic.ini: Archivo de configuración principal de Alembic que define parámetros como la ubicación de los scripts de migración y la URL de la base de datos.
+
+
+
+
+

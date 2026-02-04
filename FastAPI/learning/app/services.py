@@ -2,7 +2,7 @@ from app.db import ProductDB
 from app.models import Product
 from typing import Optional
 from sqlalchemy.orm import Session
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.exc import IntegrityError
 
 
@@ -48,7 +48,7 @@ def actualizar_stock(db: Session, id: int, quantity: int) -> Optional[ProductDB]
         nuevo_stock = product.stock + quantity
         if nuevo_stock >= 0:
             product.stock = nuevo_stock
-            product.updated_at = datetime.utcnow()
+            product.updated_at = datetime.now(timezone.utc)
             db.commit()
             db.refresh(product)
             return product
@@ -96,7 +96,7 @@ def actualizar_producto(db: Session, id: int, product: Product) -> Optional[Prod
         db_product.precio = product.precio
         db_product.categoria = product.categoria
         db_product.stock = product.stock
-        db_product.updated_at = datetime.utcnow()
+        db_product.updated_at = datetime.now(timezone.utc)
         db.commit()
         db.refresh(db_product)
         return db_product
